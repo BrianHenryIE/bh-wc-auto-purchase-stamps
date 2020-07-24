@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^.*bh-wp-auto-purchase-stampscom$ [NC,OR]
+RewriteCond %{REQUEST_URI} !vendor/wordpress/wordpress/build/
+RewriteRule (.*) vendor/wordpress/wordpress/build/$1 [L]
