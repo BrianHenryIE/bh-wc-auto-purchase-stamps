@@ -1,6 +1,6 @@
 <?php
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce;
 
 class Order_Status {
 

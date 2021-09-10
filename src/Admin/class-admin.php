@@ -9,9 +9,9 @@
  * @subpackage BH_WC_Auto_Purchase_Stamps/admin
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\admin;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Admin;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\Settings_Interface;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings_Interface;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WPTRT\AdminNotices\Notices;
 
 /**

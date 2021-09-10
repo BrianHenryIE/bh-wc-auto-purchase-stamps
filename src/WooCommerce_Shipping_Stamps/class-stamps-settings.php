@@ -1,9 +1,9 @@
 <?php
 
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce_shipping_stamps;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce_Shipping_Stamps;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\Settings;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings;
 use Psr\Log\LogLevel;
 
 class Stamps_Settings {

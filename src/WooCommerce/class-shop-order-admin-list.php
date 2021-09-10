@@ -5,10 +5,10 @@
  * wp-admin/edit.php?post_type=shop_order
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\API_Interface;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\Settings_Interface;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API_Interface;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings_Interface;
 use Psr\Log\LoggerInterface;
 use WC_Order;
 

@@ -9,7 +9,7 @@
  * @subpackage BH_WC_Auto_Purchase_Stamps/api
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\api;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\API;
 
 use BrianHenryIE\WC_Auto_Purchase_Stamps\Mpdf\Mpdf;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\Mpdf\Output\Destination;

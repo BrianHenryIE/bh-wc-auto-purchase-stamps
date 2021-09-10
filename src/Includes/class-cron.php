@@ -5,9 +5,9 @@
  * shipping label cannot automatically be purchased right now).
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\API_Interface;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API_Interface;
 
 
 class Cron {

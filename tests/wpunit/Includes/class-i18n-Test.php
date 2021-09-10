@@ -6,7 +6,7 @@
  * @author  Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
 
 /**
  * Class I18n_Test

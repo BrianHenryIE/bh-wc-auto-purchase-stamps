@@ -26,12 +26,12 @@
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\API;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\Settings;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WP_Logger\Logger;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\includes\Activator;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\includes\Deactivator;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\includes\BH_WC_Auto_Purchase_Stamps;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Includes\Activator;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Includes\Deactivator;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Includes\BH_WC_Auto_Purchase_Stamps;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {

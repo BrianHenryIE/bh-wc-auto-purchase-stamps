@@ -9,7 +9,7 @@
  * @subpackage BH_WC_Auto_Purchase_Stamps/includes
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
 
 /**
  * Fired during plugin activation.

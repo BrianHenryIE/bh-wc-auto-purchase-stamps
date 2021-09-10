@@ -8,8 +8,8 @@
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\API;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\includes\BH_WC_Auto_Purchase_Stamps;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Includes\BH_WC_Auto_Purchase_Stamps;
 
 /**
  * Verifies the plugin has been instantiated and added to PHP's $GLOBALS variable.

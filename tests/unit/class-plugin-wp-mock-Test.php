@@ -8,7 +8,7 @@
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\includes\BH_WC_Auto_Purchase_Stamps;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Includes\BH_WC_Auto_Purchase_Stamps;
 
 /**
  * Class Plugin_WP_Mock_Test

@@ -1,10 +1,10 @@
 <?php
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\api;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\API;
 
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LogLevel;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce\Order_Status;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Order_Status;
 
 class Settings implements Settings_Interface, Logger_Settings_Interface {
 

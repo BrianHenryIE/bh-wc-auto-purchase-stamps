@@ -9,7 +9,7 @@
  * @subpackage BH_WC_Auto_Purchase_Stamps/admin
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\admin;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Admin;
 
 /**
  * This class adds a `Settings` link on the plugins.php page, when possible.

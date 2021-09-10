@@ -12,20 +12,20 @@
  * @subpackage BH_WC_Auto_Purchase_Stamps/includes
  */
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\admin\Admin;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\admin\Plugins_Page;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\API;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\API_Interface;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\CLI;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\api\Settings_Interface;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Admin\Admin;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Admin\Plugins_Page;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API_Interface;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\CLI;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings_Interface;
 
 use Psr\Log\LoggerInterface;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce\Order;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce\Order_Status;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce\Shop_Order_Admin_List;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\woocommerce_shipping_stamps\Stamps_Settings;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Order;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Order_Status;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Shop_Order_Admin_List;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce_Shipping_Stamps\Stamps_Settings;
 use WP_CLI;
 
 /**

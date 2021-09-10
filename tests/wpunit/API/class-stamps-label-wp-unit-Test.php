@@ -1,6 +1,6 @@
 <?php
 
-namespace BrianHenryIE\WC_Auto_Purchase_Stamps\api;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\API;
 
 use Psr\Log\NullLogger;
 
