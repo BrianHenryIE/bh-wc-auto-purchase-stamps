@@ -1,23 +1,22 @@
-<?php 
+<?php
 
-class PluginsPageCest
-{
-    public function _before(AcceptanceTester $I)
-    {
-    }
+class PluginsPageCest {
+
+	public function _before( AcceptanceTester $I ) {
+	}
 
 
 	/**
 	 *
 	 * @param AcceptanceTester $I
 	 */
-    public function testPluginsPageForName(AcceptanceTester $I) {
+	public function testPluginsPageForName( AcceptanceTester $I ) {
 
-    	$I->loginAsAdmin();
+		$I->loginAsAdmin();
 
-    	$I->amOnPluginsPage();
+		$I->amOnPluginsPage();
 
-    	$I->canSee('BH WP Auto Purchase Stampscom' );
-    }
+		$I->canSee( 'Auto Purchase Stamps' );
+	}
 
 }

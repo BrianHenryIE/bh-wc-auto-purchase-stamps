@@ -5,11 +5,11 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    BH_WP_Auto_Purchase_Stampscom
- * @subpackage BH_WP_Auto_Purchase_Stampscom/includes
+ * @package    BH_WC_Auto_Purchase_Stamps
+ * @subpackage BH_WC_Auto_Purchase_Stamps/includes
  */
 
-namespace BH_WP_Auto_Purchase_Stampscom\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
 
 /**
  * Fired during plugin activation.
@@ -17,8 +17,8 @@ namespace BH_WP_Auto_Purchase_Stampscom\includes;
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    BH_WP_Auto_Purchase_Stampscom
- * @subpackage BH_WP_Auto_Purchase_Stampscom/includes
+ * @package    BH_WC_Auto_Purchase_Stamps
+ * @subpackage BH_WC_Auto_Purchase_Stamps/includes
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class Activator {
@@ -32,6 +32,7 @@ class Activator {
 	 */
 	public static function activate() {
 
+		// Offer to operate on all the existing processing orders.
 	}
 
 }

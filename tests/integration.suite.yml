@@ -17,6 +17,14 @@ modules:
             tablePrefix: "%TEST_TABLE_PREFIX%"
             domain: "%TEST_SITE_WP_DOMAIN%"
             adminEmail: "%TEST_SITE_ADMIN_EMAIL%"
-            title: "bh-wp-auto-purchase-stampscom"
-            plugins: ['bh-wp-auto-purchase-stampscom/bh-wp-auto-purchase-stampscom.php']
-            activatePlugins: ['bh-wp-auto-purchase-stampscom/bh-wp-auto-purchase-stampscom.php']
+            title: "bh-wc-auto-purchase-stamps"
+            plugins: [
+                    'woocommerce/woocommerce.php',
+                    'woocommerce-shipping-stamps/woocommmerce-shipping-stamps.php',
+                    'bh-wc-auto-purchase-stamps/bh-wc-auto-purchase-stamps.php'
+                ]
+            activatePlugins: [
+                    'woocommerce/woocommerce.php',
+                    'woocommerce-shipping-stamps/woocommmerce-shipping-stamps.php',
+                    'bh-wc-auto-purchase-stamps/bh-wc-auto-purchase-stamps.php'
+                ]

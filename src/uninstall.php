@@ -21,10 +21,15 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    BH_WP_Auto_Purchase_Stampscom
+ * @package    BH_WC_Auto_Purchase_Stamps
  */
 
 // If uninstall not called from WordPress, then exit.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+
+/**
+ * @see Stamps_Settings::add_plugin_settings()
+ */

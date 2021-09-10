@@ -2,11 +2,11 @@
 /**
  * Tests for I18n. Tests load_plugin_textdomain.
  *
- * @package BH_WP_Auto_Purchase_Stampscom
+ * @package BH_WC_Auto_Purchase_Stamps
  * @author  Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Auto_Purchase_Stampscom\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
 
 /**
  * Class I18n_Test
@@ -38,15 +38,15 @@ class I18n_Test extends \Codeception\TestCase\WPTestCase {
 		/**
 		 * Get the main plugin class.
 		 *
-		 * @var BH_WP_Auto_Purchase_Stampscom $bh_wp_auto_purchase_stampscom
+		 * @var BH_WC_Auto_Purchase_Stamps $bh_wc_auto_purchase_stamps
 		 */
-		$bh_wp_auto_purchase_stampscom = $GLOBALS['bh_wp_auto_purchase_stampscom'];
-		$i18n         = $bh_wp_auto_purchase_stampscom->i18n;
+		$bh_wc_auto_purchase_stamps = $GLOBALS['bh_wc_auto_purchase_stamps'];
+		$i18n                       = $bh_wc_auto_purchase_stamps->i18n;
 
 		$i18n->load_plugin_textdomain();
 
 		$this->assertTrue( $called, 'plugin_locale filter not called within load_plugin_textdomain() suggesting it has not been set by the plugin.' );
-		$this->assertEquals( 'bh-wp-auto-purchase-stampscom', $actual_domain );
+		$this->assertEquals( 'bh-wc-auto-purchase-stamps', $actual_domain );
 
 	}
 }

@@ -8,11 +8,11 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    BH_WP_Auto_Purchase_Stampscom
- * @subpackage BH_WP_Auto_Purchase_Stampscom/includes
+ * @package    BH_WC_Auto_Purchase_Stamps
+ * @subpackage BH_WC_Auto_Purchase_Stamps/includes
  */
 
-namespace BH_WP_Auto_Purchase_Stampscom\includes;
+namespace BrianHenryIE\WC_Auto_Purchase_Stamps\includes;
 
 /**
  * Define the internationalization functionality.
@@ -21,8 +21,8 @@ namespace BH_WP_Auto_Purchase_Stampscom\includes;
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    BH_WP_Auto_Purchase_Stampscom
- * @subpackage BH_WP_Auto_Purchase_Stampscom/includes
+ * @package    BH_WC_Auto_Purchase_Stamps
+ * @subpackage BH_WC_Auto_Purchase_Stamps/includes
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class I18n {
@@ -36,9 +36,9 @@ class I18n {
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'bh-wp-auto-purchase-stampscom',
+			'bh-wc-auto-purchase-stamps',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			plugin_basename( dirname( __FILE__, 2 ) ) . '/languages/'
 		);
 
 	}

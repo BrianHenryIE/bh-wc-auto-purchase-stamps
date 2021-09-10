@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file for WP_Mock.
  *
- * @package           BH_WP_Auto_Purchase_Stampscom
+ * @package           BH_WC_Auto_Purchase_Stamps
  */
 
 require_once $plugin_root_dir . '/autoload.php';
