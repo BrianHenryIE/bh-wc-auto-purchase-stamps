@@ -4,9 +4,9 @@
  *
  * Uses classmap, PSR4 & wp-namespace-autoloader.
  *
- * @link              http://example.com
+ * @link              https://BrianHenryIE.com
  * @since             1.0.0
- * @package           BH_WC_Auto_Purchase_Stamps
+ * @package           brianhenryie/wc-auto-purchase-stamps
  *
  * @see https://github.com/pablo-sg-pacheco/wp-namespace-autoloader/
  */

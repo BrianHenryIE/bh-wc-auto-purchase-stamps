@@ -35,13 +35,7 @@ class I18n_Test extends \Codeception\TestCase\WPTestCase {
 
 		add_filter( 'plugin_locale', $filter, 10, 2 );
 
-		/**
-		 * Get the main plugin class.
-		 *
-		 * @var BH_WC_Auto_Purchase_Stamps $bh_wc_auto_purchase_stamps
-		 */
-		$bh_wc_auto_purchase_stamps = $GLOBALS['bh_wc_auto_purchase_stamps'];
-		$i18n                       = $bh_wc_auto_purchase_stamps->i18n;
+		$i18n = new I18n();
 
 		$i18n->load_plugin_textdomain();
 

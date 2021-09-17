@@ -1,4 +1,9 @@
 <?php
+/**
+ * Ensure the required classes are available before we instantiate them.
+ *
+ * @package    brianhenryie/wc-auto-purchase-stamps
+ */
 
 return array(
 	'WC_Stamps_Label'      => WP_CONTENT_DIR . '/plugins/woocommerce-shipping-stamps/includes/class-wc-stamps-label.php',

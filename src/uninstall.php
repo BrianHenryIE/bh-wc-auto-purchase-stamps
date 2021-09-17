@@ -18,10 +18,10 @@
  * For more information, see the following discussion:
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * @link       http://example.com
+ * @link       https://BrianHenryIE.com
  * @since      1.0.0
  *
- * @package    BH_WC_Auto_Purchase_Stamps
+ * @package    brianhenryie/wc-auto-purchase-stamps
  */
 
 // If uninstall not called from WordPress, then exit.
@@ -29,7 +29,13 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-
 /**
+ * Delete the options that were saved by this plugin.
+ *
+ * @see \BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings
  * @see Stamps_Settings::add_plugin_settings()
  */
+delete_option( 'bh_wc_auto_purchase_stamps_enabled' );
+delete_option( 'bh_wc_auto_purchase_stamps_set_purchased_status' );
+delete_option( 'bh_wc_auto_purchase_stamps_set_printed_status' );
+delete_option( 'bh_wc_auto_purchase_stamps_log_level' );

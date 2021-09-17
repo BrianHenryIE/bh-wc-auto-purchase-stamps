@@ -2,7 +2,7 @@
 /**
  * Silence is golden.
  *
- * @package    BH_WC_Auto_Purchase_Stamps
+ * @package    brianhenryie/wc-auto-purchase-stamps
  */
 
 die();

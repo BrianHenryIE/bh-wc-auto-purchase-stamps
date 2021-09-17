@@ -5,50 +5,43 @@
  * A class definition that includes attributes and functions used across both the
  * frontend-facing side of the site and the admin area.
  *
- * @link       http://example.com
+ * @link       https://BrianHenryIE.com
  * @since      1.0.0
  *
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/includes
+ * @package    brianhenryie/wc-auto-purchase-stamps
  */
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\Admin\Admin;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\Action_Scheduler\Scheduler;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\Admin\Plugins_Page;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\API\API_Interface;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\API\CLI;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\API\Settings_Interface;
-
-use Psr\Log\LoggerInterface;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Order;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Order_Status;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce\Shop_Order_Admin_List;
 use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce_Shipping_Stamps\Stamps_Settings;
+use Psr\Log\LoggerInterface;
 use WP_CLI;
 
 /**
  * The core plugin class.
  *
- * This is used to define internationalization, admin-specific hooks, and
- * frontend-facing site hooks.
- *
- * Also maintains the unique identifier of this plugin as well as the current
- * version of the plugin.
+ * Add the actions and filters for the plugin.
  *
  * @since      1.0.0
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/includes
+ * @package    brianhenryie/wc-auto-purchase-stamps
+ *
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class BH_WC_Auto_Purchase_Stamps {
 
-	protected $logger;
+	protected LoggerInterface $logger;
 
-	protected $settings;
+	protected Settings_Interface $settings;
 
-	protected $api;
+	protected API_Interface $api;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -57,13 +50,13 @@ class BH_WC_Auto_Purchase_Stamps {
 	 * Load the dependencies, define the locale, and set the hooks for the admin area and
 	 * the frontend-facing side of the site.
 	 *
-	 * @param API_Interface      $api
-	 * @param Settings_Interface $settings
-	 * @param LoggerInterface    $logger
+	 * @param API_Interface      $api The plugin's main functions.
+	 * @param Settings_Interface $settings The plugin settings.
+	 * @param LoggerInterface    $logger A PSR logger.
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct( $api, $settings, $logger ) {
+	public function __construct( API_Interface $api, Settings_Interface $settings, LoggerInterface $logger ) {
 
 		$this->logger   = $logger;
 		$this->settings = $settings;
@@ -71,12 +64,15 @@ class BH_WC_Auto_Purchase_Stamps {
 
 		$this->set_locale();
 
-		$this->define_admin_hooks();
+		$this->define_plugins_page_hooks();
 
-		$this->define_api_hooks();
+		$this->define_stamps_settings_hooks();
+		$this->define_woocommerce_order_status_hooks();
+		$this->define_woocommerce_order_admin_list_hooks();
+		$this->define_woocommerce_order_hooks();
+		$this->define_action_scheduler_hooks();
 
-		$this->define_cron_hooks();
-		$this->define_woocommerce_hooks();
+		$this->define_cli_hooks();
 	}
 
 	/**
@@ -87,86 +83,102 @@ class BH_WC_Auto_Purchase_Stamps {
 	 *
 	 * @since    1.0.0
 	 */
-	protected function set_locale() {
+	protected function set_locale(): void {
 
 		$plugin_i18n = new I18n();
 
-		add_action( 'plugins_loaded', array( $plugin_i18n, 'load_plugin_textdomain' ) );
-
+		add_action( 'init', array( $plugin_i18n, 'load_plugin_textdomain' ) );
 	}
 
 	/**
-	 * Register all of the hooks related to the admin area functionality
-	 * of the plugin.
-	 *
-	 * @since    1.0.0
+	 * Add a link to settings on the plugins page, and a link to Stamps.com.
 	 */
-	protected function define_admin_hooks() {
-
-		$plugin_admin = new Admin( $this->settings );
-
-		// Leaving these in because they might be used on a settings page.
-		// add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );
-
-		add_action( 'admin_init', array( $plugin_admin, 'check_required_plugins_active' ) );
+	protected function define_plugins_page_hooks(): void {
 
 		// Add a link to the admin page on the plugin's entry.
-		$this->plugins_page = new Plugins_Page();
-		$plugin_basename    = $this->settings->get_plugin_basename();
-		add_filter( "plugin_action_links_{$plugin_basename}", array( $this->plugins_page, 'action_links' ) );
+		$plugins_page    = new Plugins_Page();
+		$plugin_basename = $this->settings->get_plugin_basename();
 
+		add_filter( "plugin_action_links_{$plugin_basename}", array( $plugins_page, 'action_links' ), 10, 4 );
+		add_filter( 'plugin_row_meta', array( $plugins_page, 'row_meta' ), 10, 4 );
 	}
 
-	protected function define_woocommerce_hooks() {
+	/**
+	 * Hook into actions when the WooCommerce order status changes.
+	 */
+	protected function define_woocommerce_order_hooks(): void {
 
-		if ( $this->settings->is_enabled() ) {
+		$order = new Order( $this->settings, $this->logger );
+		add_action(
+			'woocommerce_order_status_changed',
+			array( $order, 'schedule_purchase_stamps_on_status_change_to_paid' ),
+			10,
+			3
+		);
+		add_action( 'woocommerce_payment_complete', array( $order, 'schedule_purchase_stamps_on_payment_complete' ) );
+		add_action( 'admin_action_mark_processing', array( $order, 'on_bulk_order_processing' ) );
+	}
 
-			$order = new Order( $this->settings, $this->logger );
-			add_action( 'woocommerce_order_status_changed', array( $order, 'schedule_purchase_stamps_on_paid' ), 10, 3 );
-			add_action( 'admin_action_mark_processing', array( $order, 'on_bulk_order_processing' ) );
-		}
+	/**
+	 * Add this plugin's settings to the bottom of the Stamps.com plugin's settings page.
+	 */
+	protected function define_stamps_settings_hooks(): void {
 
 		$stamps_settings = new Stamps_Settings();
+
 		add_filter( 'wc_settings_tab_stamps', array( $stamps_settings, 'add_plugin_settings' ), 11, 1 );
+	}
+
+	/**
+	 * Register the 'Shipping Label Purchased' and 'Printed' statuses, ensuring they are registered as paid statuses, and appear in reports.
+	 */
+	protected function define_woocommerce_order_status_hooks(): void {
 
 		$order_status = new Order_Status();
+
 		add_action( 'woocommerce_init', array( $order_status, 'register_status' ) );
 		add_filter( 'wc_order_statuses', array( $order_status, 'add_order_status_to_woocommerce' ), 9 );
 		add_filter( 'woocommerce_order_is_paid_statuses', array( $order_status, 'add_to_paid_status_list' ) );
 		add_filter( 'woocommerce_reports_order_statuses', array( $order_status, 'add_to_reports_status_list' ) );
-
-		/**
-		 * Shop_Order_Post_Page is the orders list in the admin UI – wp-admin/edit.php?post_type=shop_order
-		 */
-		$shop_order_posts_page = new Shop_Order_Admin_List( $this->api, $this->settings, $this->logger );
-		add_filter( 'bulk_actions-edit-shop_order', array( $shop_order_posts_page, 'register_bulk_action_print_4x6_stamps_labels_pdf' ), 20, 1 );
-		add_action( 'admin_action_print_4x6_stamps_labels_pdf', array( $shop_order_posts_page, 'generate_print_4x6_stamps_labels_pdf' ) );
-
-	}
-
-	protected function define_cron_hooks() {
-
-		$cron = new Cron( $this->api );
-
-		add_action( API::ORDER_PAID_CRON_JOB_NAME, $cron, 'auto_purchase_stamps_for_order' );
-
 	}
 
 	/**
+	 * Add and handle the bulk-print action on the admin orders list page.
+	 *
+	 * @see wp-admin/edit.php?post_type=shop_order
+	 */
+	protected function define_woocommerce_order_admin_list_hooks(): void {
+
+		$shop_order_posts_page = new Shop_Order_Admin_List( $this->api, $this->settings, $this->logger );
+
+		add_filter( 'bulk_actions-edit-shop_order', array( $shop_order_posts_page, 'register_bulk_action_print_4x6_stamps_labels_pdf' ), 20, 1 );
+		add_action( 'admin_action_print_4x6_stamps_labels_pdf', array( $shop_order_posts_page, 'generate_print_4x6_stamps_labels_pdf' ) );
+	}
+
+	/**
+	 * Add the action that handles events initiated by Action Scheduler.
+	 */
+	protected function define_action_scheduler_hooks(): void {
+
+		$scheduler = new Scheduler( $this->api, $this->logger );
+
+		add_action( Scheduler::ORDER_PAID_JOB_ACTION_NAME, array( $scheduler, 'purchase_stamps_for_order' ) );
+	}
+
+	/**
+	 * Add a `wp stamps purchase` CLI command.
 	 *
 	 * @since    1.0.0
-	 * @access   protected
 	 */
-	protected function define_api_hooks() {
+	protected function define_cli_hooks(): void {
 
 		if ( ! class_exists( WP_CLI::class ) ) {
 			return;
 		}
-		CLI::$api = $this->api;
 
-		// wp stamps
-		WP_CLI::add_command( 'stamps', CLI::class );
+		$cli = new CLI( $this->api );
+
+		WP_CLI::add_command( 'stamps', array( $cli, 'purchase' ) );
 
 	}
 }

@@ -18,7 +18,15 @@
     "repositories": [
         {
             "type": "path",
+            "url": "../bh-pdf-helpers"
+        },
+        {
+            "type": "path",
             "url": "../bh-wp-logger"
+        },
+        {
+            "url": "https://github.com/BrianHenryIE/bh-wp-logger",
+            "type": "git"
         },
         {
             "url": "https://github.com/BrianHenryIE/admin-notices",
@@ -39,16 +47,15 @@
     ],
     "require": {
         "brianhenryie/wp-logger": "dev-master",
-        "ext-gd": "*",
         "mpdf/mpdf": "*",
-        "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master",
-        "php": ">=7.4"
+        "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master"
     },
     "require-dev": {
         "10up/wp_mock": "0.4.2",
         "antecedent/patchwork": "^2.1",
+        "brianhenryie/color-logger": "^1.0",
         "brianhenryie/composer-phpstorm": "dev-master",
-        "brianhenryie/strauss": "*",
+        "brianhenryie/strauss": "dev-master",
         "codeception/module-asserts": "^1.0",
         "codeception/module-cli": "^1.0",
         "codeception/module-db": "^1.0.0",
@@ -61,18 +68,18 @@
         "jaschilz/php-coverage-badger": "^2.0",
         "kporras07/composer-symlinks": "dev-master",
         "lucatume/wp-browser": "*",
+        "php-stubs/woocommerce-stubs": "^5.2",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpstan/extension-installer": "^1.1",
         "phpunit/phpcov": "*",
         "squizlabs/php_codesniffer": "*",
         "szepeviktor/phpstan-wordpress": "^0.7.2",
-        "voku/portable-ascii": "dev-master",
         "wordpress/wordpress": "*",
-        "wp-cli/dist-archive-command": "dev-master",
         "wp-cli/wp-cli-bundle": "*",
+        "wp-cli/dist-archive-command": "dev-master",
         "wp-coding-standards/wpcs": "*",
-        "wpackagist-plugin/woocommerce": "^5.6",
-        "wpackagist-theme/storefront": "^3.8"
+        "wpackagist-plugin/woocommerce": "^5.1",
+        "wpackagist-theme/storefront": "*"
     },
     "extra": {
         "patches": {
@@ -87,6 +94,7 @@
             "namespace_prefix": "BrianHenryIE\\WC_Auto_Purchase_Stamps\\",
             "target_directory": "/src/strauss/",
             "classmap_prefix": "BH_WC_Auto_Purchase_Stamps_",
+            "constants_prefix": "BWAPS_",
             "override_autoload": {
                 "yahnis-elsts/plugin-update-checker": {
                     "classmap": ["Puc"],
@@ -97,7 +105,10 @@
                 }
             },
             "exclude_from_prefix": {
-                "packages": ["yahnis-elsts/plugin-update-checker","erusev/parsedown"]
+                "packages": ["yahnis-elsts/plugin-update-checker","erusev/parsedown"],
+                "file_patterns": [
+                    "/^psr.*$/"
+                ]
             },
             "namespace_replacement_patterns": {
                 "~BrianHenryIE\\\\(.*)~" : "BrianHenryIE\\WC_Auto_Purchase_Stamps\\\\$1"

@@ -2,11 +2,10 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       http://example.com
+ * @link       https://BrianHenryIE.com
  * @since      1.0.0
  *
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/includes
+ * @package    brianhenryie/wc-auto-purchase-stamps
  */
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
@@ -17,8 +16,8 @@ namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/includes
+ * @package    brianhenryie/wc-auto-purchase-stamps
+ *
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class Deactivator {
@@ -30,7 +29,7 @@ class Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
+	public static function deactivate(): void {
 
 		// TODO: delete the cron job.
 	}

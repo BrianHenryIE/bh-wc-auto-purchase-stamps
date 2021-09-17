@@ -4,7 +4,9 @@ parameters:
         - src
     excludePaths:
         - src/strauss/*
+        - src/Admin/class-dependencies.php
     bootstrapFiles:
+        - phpstanbootstrap.php
         - src/autoload.php
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     scanDirectories:
@@ -12,4 +14,9 @@ parameters:
         - wp-content/plugins
         - vendor/wp-cli
     ignoreErrors:
+        # LoggerAwareTrait allows for null $logger, but we set it in the constructor.
         - '#LoggerInterface\|null#'
+        # The Stamps API static methods have incorrect typehints.
+        - '#Stamps_Plugin_API.*but returns array#'
+        # PHPStan show errors when filters have more than two parameters.
+        - '#^Function apply_filters(_ref_array)? invoked with \d parameters, 2 required\.$#'

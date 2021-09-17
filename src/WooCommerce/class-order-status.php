@@ -12,6 +12,8 @@ class Order_Status {
 	 */
 	const SHIPPING_LABEL_PURCHASED_STATUS = 'shippingpurchased';
 
+	const PRINTED_STATUS = 'printed';
+
 	/**
 	 * Register the order/post status with WordPress.
 	 *
@@ -33,12 +35,25 @@ class Order_Status {
 				'label_count'               => _n_noop( 'Shipping Label Purchased <span class="count">(%s)</span>', 'Shipping Labels Purchased <span class="count">(%s)</span>' ),
 			)
 		);
+
+		register_post_status(
+			'wc-' . self::PRINTED_STATUS,
+			array(
+				'label'                     => 'Printed',
+				'public'                    => true,
+				'exclude_from_search'       => false,
+				'show_in_admin_all_list'    => true,
+				'show_in_admin_status_list' => true,
+				'label_count'               => _n_noop( 'Printed <span class="count">(%s)</span>', 'Printed <span class="count">(%s)</span>' ),
+			)
+		);
 	}
 
 	/**
 	 * Add "wc-shippingpurchased" to WooCommerce's list of statuses.
+	 * Add "wc-printed" to WooCommerce's list of statuses.
 	 *
-	 * Adds the new order status after "Processing".
+	 * Adds the new order statuses after "Processing".
 	 *
 	 * @hooked wc_order_statuses
 	 * @see wc_get_order_statuses()
@@ -54,6 +69,7 @@ class Order_Status {
 			$new_order_statuses[ $key ] = $status;
 			if ( 'wc-processing' === $key ) {
 				$new_order_statuses[ 'wc-' . self::SHIPPING_LABEL_PURCHASED_STATUS ] = 'Shipping Label Purchased';
+				$new_order_statuses[ 'wc-' . self::PRINTED_STATUS ]                  = 'Printed';
 			}
 		}
 		return $new_order_statuses;
@@ -70,6 +86,7 @@ class Order_Status {
 	 */
 	public function add_to_paid_status_list( $statuses ): array {
 		$statuses[] = self::SHIPPING_LABEL_PURCHASED_STATUS;
+		$statuses[] = self::PRINTED_STATUS;
 		return $statuses;
 	}
 
@@ -81,7 +98,7 @@ class Order_Status {
 	 * @see \WC_Admin_Report::get_order_report_data()
 	 * @see wp-admin/admin.php?page=wc-reports
 	 *
-	 * @param $order_status
+	 * @param false|string[] $order_status
 	 *
 	 * @return false|string[]
 	 */
@@ -103,6 +120,7 @@ class Order_Status {
 		// $this->logger->debug( 'Adding order status to reports status list', array( 'hooked' => 'woocommerce_reports_order_statuses' ) );
 
 		$order_status[] = self::SHIPPING_LABEL_PURCHASED_STATUS;
+		$order_status[] = self::PRINTED_STATUS;
 
 		return $order_status;
 	}

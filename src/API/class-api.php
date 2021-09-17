@@ -1,18 +1,17 @@
 <?php
 /**
  *
- *
- * @link       http://example.com
+ * @link       https://BrianHenryIE.com
  * @since      1.0.0
  *
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/api
+ * @package    brianhenryie/wc-auto-purchase-stamps
  */
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps\API;
 
-use BrianHenryIE\WC_Auto_Purchase_Stamps\Mpdf\Mpdf;
-use BrianHenryIE\WC_Auto_Purchase_Stamps\Mpdf\Output\Destination;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\PdfHelpers\PdfConcatenate;
+use BrianHenryIE\WC_Auto_Purchase_Stamps\WooCommerce_Shipping_Stamps\Stamps_Plugin_API;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WC_Order;
 use WC_Stamps_Post_Types;
@@ -23,116 +22,142 @@ use WC_Stamps_Post_Types;
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the frontend-facing stylesheet and JavaScript.
  *
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/frontend
+ * @package    brianhenryie/wc-auto-purchase-stamps
+ *
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class API implements API_Interface {
 
-	const ORDER_PAID_CRON_JOB_NAME = 'bh-wc-auto-purchase-stamps-process-order';
+	use LoggerAwareTrait;
 
-	/** @var Settings_Interface */
-	protected $settings;
+	/**
+	 * Used when instantiating `Stamps_Label`.
+	 *
+	 * @var Settings_Interface The plugin settings.
+	 */
+	protected Settings_Interface $settings;
 
-	/** @var LoggerInterface */
-	protected $logger;
-
+	protected Stamps_Plugin_API $stamps_plugin_api;
 
 	/**
 	 * API constructor.
 	 *
-	 * @param Settings_Interface $settings
-	 * @param LoggerInterface    $logger
+	 * @param Settings_Interface $settings The plugin settings.
+	 * @param LoggerInterface    $logger A PSR logger.
 	 */
-	public function __construct( $settings, $logger ) {
+	public function __construct( Settings_Interface $settings, LoggerInterface $logger ) {
 
 		$this->settings = $settings;
-		$this->logger   = $logger;
+		$this->setLogger( $logger );
+
+		$this->stamps_plugin_api = new Stamps_Plugin_API();
 
 	}
 
 	/**
 	 * Function to call from cron.
 	 *
-	 * @param string $order_id
+	 * @param WC_Order $order The WooCommerce order.
+	 *
+	 * @return array{success:bool, message:string, labels?:array, file?:array}
 	 */
-	public function auto_purchase_stamps_for_order( $order_id ): void {
+	public function auto_purchase_stamps_for_order( WC_Order $order ): array {
 
-		$order = wc_get_order( $order_id );
+		$context             = array();
+		$order_id            = $order->get_id();
+		$context['order_id'] = $order_id;
 
-		if ( false === $order ) {
+		// Check do we already have any?
 
-			$this->logger->debug( 'No order found ' . $order_id );
+		$labels_for_orders            = $this->stamps_plugin_api->get_order_labels( $order_id );
+		$labels_for_orders_count      = count( $labels_for_orders );
+		$context['labels_for_orders'] = $labels_for_orders_count;
+		$context['labels']            = $labels_for_orders;
 
-			return;
+		if ( 0 !== count( $labels_for_orders ) ) {
+
+			$message = 'Order already has stamps purchased ' . $order_id;
+
+			$this->logger->debug( $message, $context );
+
+			$labels_filepaths = $order->get_meta( Stamps_Label::LABEL_PDF_FILES_PATH_META_KEY, true );
+
+			return array(
+				'success' => false,
+				'message' => $message,
+				'labels'  => $labels_filepaths,
+			);
 		}
 
-		if ( 'processing' !== $order->get_status() ) {
+		$order_status            = $order->get_status();
+		$context['order_status'] = $order_status;
 
-			$this->logger->debug( 'Order status not processing (maybe already changed by another plugin?) ' . $order_id );
+		if ( ! in_array( $order_status, wc_get_is_paid_statuses(), true ) ) {
 
-			return;
+			$message = "Order $order_id has not been paid : $order_status.";
+			$this->logger->debug( $message, $context );
+
+			return array(
+				'success' => false,
+				'message' => $message,
+			);
 		}
+
+		$disable = false;
 
 		/**
 		 * A filter to allow disabling auto-purchasing for this order.
 		 *
-		 * e.g. do not run for wholesale orders.
+		 * e.g. Do not run for wholesale orders.
+		 *
+		 * @param bool $disable Should auto-printing be disabled for this order?
+		 * @param WC_Order $order The order object.
+		 * @return bool
 		 */
-		$disable = apply_filters( 'disable_auto_purchase_stamps', false, $order );
-
-		if ( 'US' !== $order->get_shipping_country() ) {
-			$disable = true;
-		}
-
-		// TODO: move out of here.
-		// Disable for wholesale orders
-		if ( 'wholesale' === $order->get_meta( '_wwpp_order_type' ) ) {
-			$disable = true;
-		}
+		$disable = apply_filters( 'bh_wc_auto_purchase_stamps_disable', $disable, $order );
 
 		if ( false !== $disable ) {
 
-			$this->logger->debug( 'Filter disabled auto purchase for this order ' . $order_id );
+			$message = 'Filter disabled auto purchase for this order ' . $order_id;
 
-			return;
+			$this->logger->debug( $message, $context );
+
+			return array(
+				'success' => false,
+				'message' => $message,
+			);
 		}
 
-		$this->purchase_stamps_for_order( $order_id );
+		return $this->purchase_stamps_for_order( $order );
 	}
 
 	/**
 	 *
 	 *
-	 * @param int $order_id
+	 * @param WC_Order $order The WooCommerce order.
+	 *
+	 * @return array{success:bool, message:string, file?:array}
 	 */
-	public function purchase_stamps_for_order( $order_id ): void {
+	public function purchase_stamps_for_order( WC_Order $order ): array {
 
-		$order = wc_get_order( $order_id );
+		$context             = array();
+		$order_id            = $order->get_id();
+		$context['order_id'] = $order_id;
 
-		if ( ! ( $order instanceof WC_Order ) ) {
-
-			$this->logger->debug( 'No order found ' . $order_id );
-
-			return;
-		}
+		$order_shipping_country            = $order->get_shipping_country();
+		$context['order_shipping_country'] = $order_shipping_country;
 
 		// TODO: Only run for US orders. (at least until customs is figured out!)
-		if ( 'US' !== $order->get_shipping_country() ) {
+		if ( 'US' !== $order_shipping_country ) {
 
-			$this->logger->info( 'Non US order ' . $order_id );
+			$message = 'Non US order ' . $order_id;
 
-			return;
-		}
+			$this->logger->info( $message, $context );
 
-		// Check do we already have any?
-		$labels_for_orders = \WC_Stamps_Labels::get_order_labels( $order_id );
-
-		if ( 0 !== count( $labels_for_orders ) ) {
-
-			$this->logger->debug( 'Order already has stamps purchased ' . $order_id );
-
-			return;
+			return array(
+				'success' => false,
+				'message' => $message,
+			);
 		}
 
 		// Prereq.
@@ -143,117 +168,80 @@ class API implements API_Interface {
 
 		$stamps_label = new Stamps_Label( $this->settings, $this->logger );
 
-		$stamps_label->do_order( $order );
+		return $stamps_label->do_order( $order );
 
 	}
 
 
 	/**
+	 * Given a list of order ids, auto-purchases the stamps.com labels, then concatenates them into a single pdf for output.
+	 *
 	 * Intended for bulk printing labels from the orders screen.
 	 *
-	 * @param array $order_ids
+	 * @used-by Shop_Order_Admin_List::generate_print_4x6_stamps_labels_pdf()
+	 *
+	 * @param WC_Order[] $orders The list of orders to print the labels for.
+	 * @return array{order_ids_succeeded:array,order_ids_failed:array,file?:array,filepath?:string}
 	 */
-	public function generate_merged_4x6_pdf_for_orders( $order_ids ) {
+	public function generate_merged_4x6_pdf_for_orders( array $orders ): array {
 
-		$png_file_list = array();
+		$pdf_file_list = array();
 
-		foreach ( $order_ids as $order_id ) {
-			$this->purchase_stamps_for_order( $order_id );
+		$order_ids = array();
 
-			$order = wc_get_order( $order_id );
+		foreach ( $orders as $order ) {
 
-			$png_path = $order->get_meta( Stamps_Label::LABEL_PNG_FILE_PATH_META_KEY );
-			if ( ! empty( $png_path ) ) {
-				$png_file_list[ $order_id ] = $png_path;
+			$order_ids[] = $order->get_id();
+
+			$result = $this->auto_purchase_stamps_for_order( $order );
+
+			if ( ! isset( $result['labels'] ) ) {
+				continue;
+			}
+
+			$file_path = array_pop( $result['labels'] );
+			if ( file_exists( WP_CONTENT_DIR . '/' . $file_path ) ) {
+				$pdf_file_list[ $order->get_id() ] = WP_CONTENT_DIR . '/' . $file_path;
 			}
 		}
 
-		$html = '';
+		// TODO: would be nicer formatted rather than unix time.
+		$time                = time();
+		$filename            = "stamps-labels-4x6-bulk-print-$time.pdf";
+		$tmp_output_filepath = get_temp_dir() . $filename;
 
-		foreach ( $png_file_list as $png ) {
+		$concatenated_pdf = new PdfConcatenate();
+		$concatenated_pdf->concatenateSequentially( $pdf_file_list, $tmp_output_filepath );
 
-			$html .= '<div style="page-break-after: auto;" >';
-			$html .= '<img style="width: 350px;" src="' . ABSPATH . $png . '" />';
-			$html .= '</div>';
-
+		if ( ! file_exists( $tmp_output_filepath ) ) {
+			return array(
+				'order_ids_succeeded' => array(),
+				'order_ids_failed'    => $order_ids,
+			);
 		}
 
-		$output_path = ABSPATH . '/wp-content/uploads/private/stamps-4x6-' . time() . '.pdf';
-
-		$result = $this->generate_pdf( $html, $output_path );
-
-		if ( ! is_null( $result ) ) {
-
-			// Maybe mark orders complete.
-			if ( ! is_null( $this->settings->order_status_after_bulk_printing() ) ) {
-
-				foreach ( $png_file_list as $order_id => $png ) {
-
-					$order = wc_get_order( $order_id );
-					$note  = 'Bulk printed 4x6';
-					$order->set_status( $this->settings->order_status_after_bulk_printing(), $note );
-					$order->save();
-
-				}
-			}
-
-			$result = str_replace( ABSPATH, site_url(), $result );
-
-			wp_safe_redirect( $result );
-		}
-
-		exit;
-	}
-
-
-	/**
-	 * Uses MPDF to generate and save a PDF.
-	 *
-	 * @param string
-	 * @param string
-	 * @param array  $args
-	 *
-	 * @see Mpdf
-	 *
-	 * @return ?string path
-	 */
-	protected function generate_pdf( $html, $output_path, $args = array() ): ?string {
-
-		$this->logger->debug( 'generate_pdf ' . $output_path );
-
-		$paper_orientation = 'portrait';
-
-		$mpdf_config = array(
-			'orientation'   => $paper_orientation,
-			'format'        => array( 100, 150 ), // 4x6
-			'margin_left'   => 6,
-			'margin_right'  => 5,
-			'margin_top'    => 6,
-			'margin_bottom' => 5,
-			'margin_header' => 0,
-			'margin_footer' => 0,
+		$result = array(
+			'order_ids_succeeded' => array_keys( $pdf_file_list ),
+			'order_ids_failed'    => array_diff( $order_ids, array_keys( $pdf_file_list ) ),
 		);
 
-		// TODO: merge defaults.
+		/** @var \BrianHenryIE\WP_Private_Uploads\API\API_Interface $bh_wp_private_uploads */
+		global $bh_wp_private_uploads;
 
-		try {
-			$mpdf = new Mpdf( $mpdf_config );
-
-			$mpdf->WriteHTML( $html );
-
-			$mpdf->Output( $output_path, Destination::FILE );
-
-			$this->logger->info( 'Success: ' . $output_path );
-
-			return $output_path;
-
-		} catch ( \Exception $e ) {
-
-			$this->logger->error( $e->getMessage(), array( 'exception' => $e ) );
-
-			return null;
+		if ( empty( $bh_wp_private_uploads ) ) {
+			$result['filepath'] = $tmp_output_filepath;
+			return $result;
 		}
 
+		/**
+		 * @var array{file?:string, url?:string, type?:string, error?:string} $file
+		 */
+		$file = $bh_wp_private_uploads->move_file_to_private_uploads( $tmp_output_filepath, $filename );
+
+		$result['file']     = $file;
+		$result['filepath'] = isset( $file['file'] ) ? $file['file'] : $tmp_output_filepath;
+
+		return $result;
 	}
 
 }

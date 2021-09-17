@@ -7,16 +7,16 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://example.com
+ * @link              https://BrianHenryIE.com
  * @since             1.0.0
- * @package           BH_WC_Auto_Purchase_Stamps
+ * @package           brianhenryie/wc-auto-purchase-stamps
  *
  * @wordpress-plugin
  * Plugin Name:       Auto Purchase Stamps
- * Plugin URI:        http://github.com/BrianHenryIE/bh-wc-auto-purchase-stamps/
+ * Plugin URI:        http://github.com/brianhenryie/bh-wc-auto-purchase-stamps/
  * Description:       Automatically purchases shipping labels when orders are paid using the WooCommerce Stamps.com API integration.
  * Version:           1.1.0
- * Author:            Brian Henry
+ * Author:            BrianHenryIE
  * Author URI:        http://BrianHenryIE.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -47,26 +47,9 @@ require_once plugin_dir_path( __FILE__ ) . 'autoload.php';
  */
 define( 'BH_WC_AUTO_PURCHASE_STAMPS_VERSION', '1.1.0' );
 
-/**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-activator.php
- */
-function activate_bh_wc_auto_purchase_stamps() {
 
-	Activator::activate();
-}
-
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-deactivator.php
- */
-function deactivate_bh_wc_auto_purchase_stamps() {
-
-	Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'BH_WC_Auto_Purchase_Stamps\activate_bh_wc_auto_purchase_stamps' );
-register_deactivation_hook( __FILE__, 'BH_WC_Auto_Purchase_Stamps\deactivate_bh_wc_auto_purchase_stamps' );
+register_activation_hook( __FILE__, array( Activator::class, 'activate' ) );
+register_deactivation_hook( __FILE__, array( Deactivator::class, 'deactivate' ) );
 
 
 /**
@@ -78,7 +61,7 @@ register_deactivation_hook( __FILE__, 'BH_WC_Auto_Purchase_Stamps\deactivate_bh_
  *
  * @since    1.0.0
  */
-function instantiate_bh_wc_auto_purchase_stamps() {
+function instantiate_bh_wc_auto_purchase_stamps(): API {
 
 	$settings = new Settings();
 	$logger   = Logger::instance( $settings );
@@ -94,5 +77,5 @@ function instantiate_bh_wc_auto_purchase_stamps() {
 }
 
 
-$GLOBALS['bh_wc_auto_purchase_stamps'] = $bh_wc_auto_purchase_stamps = instantiate_bh_wc_auto_purchase_stamps();
+$GLOBALS['bh_wc_auto_purchase_stamps'] = instantiate_bh_wc_auto_purchase_stamps();
 

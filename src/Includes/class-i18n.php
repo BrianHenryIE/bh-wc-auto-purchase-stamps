@@ -5,11 +5,10 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       http://example.com
+ * @link       https://BrianHenryIE.com
  * @since      1.0.0
  *
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/includes
+ * @package    brianhenryie/wc-auto-purchase-stamps
  */
 
 namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
@@ -21,19 +20,17 @@ namespace BrianHenryIE\WC_Auto_Purchase_Stamps\Includes;
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    BH_WC_Auto_Purchase_Stamps
- * @subpackage BH_WC_Auto_Purchase_Stamps/includes
+ * @package    brianhenryie/wc-auto-purchase-stamps
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class I18n {
-
 
 	/**
 	 * Load the plugin text domain for translation.
 	 *
 	 * @since    1.0.0
 	 */
-	public function load_plugin_textdomain() {
+	public function load_plugin_textdomain(): void {
 
 		load_plugin_textdomain(
 			'bh-wc-auto-purchase-stamps',
@@ -42,7 +39,5 @@ class I18n {
 		);
 
 	}
-
-
 
 }
